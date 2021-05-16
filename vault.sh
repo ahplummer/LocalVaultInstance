@@ -27,11 +27,15 @@ help() {
   echo "   > startVault - starts a pre-initialized Vault container"
   echo "   > stopVault - stops a running Vault container, not destructive"
   echo "   > ----------------------"
+  echo "   > setSecret - sets a secret, requires 3 additional parms"
+  echo "   > getSecret - gets a secret, requires 2 additional parms"
+  echo "   > ----------------------"  
   echo "   > help - Display this help"
   echo -e -n "$NORMAL"
   echo "-----------------------------------------------------------------------"
 
 }
+
 destroyLocal(){
   stopVaultDocker
 	rm -rf ./file
@@ -114,12 +118,34 @@ initializeVault(){
   sleep 2
 	vault operator unseal $unsealtoken
 	rm -rf initoutput
+  vault secrets enable kv-v2
+}
+setSecret(){
+  if [ -f ".env" ]
+  then
+    source .env
+  else
+    error "For this command, you'll need a pre-configured Vault instance; try './vault.sh initS3' or './vault.sh' initLocal"
+    exit 1
+  fi
+  vault login $ROOT_TOKEN >/dev/null
+  vault kv put kv-v2/$1 $2=$3
+}
+getSecret(){
+  if [ -f ".env" ]
+  then
+    source .env
+  else
+    error "For this command, you'll need a pre-configured Vault instance; try './vault.sh initS3' or './vault.sh' initLocal"
+    exit 1
+  fi
+  vault login $ROOT_TOKEN >/dev/null
+  export secret=$(VAULT_FORMAT=json vault kv get kv-v2/$1 | jq -r '.data.data.'$2)
+  echo $secret
 }
 
-log "The 73' monster Vault script..."
 
-
-# Check 1 argument is given #
+# Check at least 1 argument is given #
 if [ $# -lt 1 ]
 then
         help
@@ -155,6 +181,24 @@ startVault) log "Start Vault Command received"
 # Stop Vault instance
 stopVault) log "Stop Vault Command received"
     stopVaultDocker
+    ;;
+# Set Secret
+setSecret) 
+if [[ -z $2 || -z $3 || -z $4 ]]
+    then
+      error "You need three additional parms for this command (location, key, secret)"
+    else
+      setSecret $2 $3 $4
+    fi
+    ;;
+# Get Secret
+getSecret) 
+    if [[ -z $2 || -z $3 ]]
+    then
+      error "You need two additional parms for this command (location, key)"
+    else
+      getSecret $2 $3 
+    fi
     ;;
 *) error "Invalid option"
     #other things?
