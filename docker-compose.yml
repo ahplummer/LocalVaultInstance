@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+    vault:
+      image: vault:latest
+      volumes:
+        - ./vault/config:/vault/config
+        - ./vault/policies:/vault/policies
+        - ./vault/data:/vault/data
+        - ./file:/vault/file:rw
+      ports:
+        - 8200:8200
+      environment:
+        - VAULT_ADDR=http://0.0.0.0:8200
+        - VAULT_API_ADDR=http://0.0.0.0:8200
+        - VAULT_ADDRESS=http://0.0.0.0:8200
+        - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+        - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+        - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      cap_add:
+        - IPC_LOCK
+      command: vault server -config=${VAULT_CONFIG}
