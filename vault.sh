@@ -38,7 +38,7 @@ help() {
 
 destroyLocal(){
   stopVaultDocker
-	rm -rf ./file
+  rm -rf ./file
   rm -rf .env
   log "Removed Local Environment"
 }
