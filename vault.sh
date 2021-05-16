@@ -76,7 +76,6 @@ setS3Env(){
 	echo export VAULT_CONFIG=/vault/config/vaultS3.json >> .env
 	echo export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id) >> .env
 	echo export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key) >> .env
-	#aws s3api put-public-access-block --bucket vault-$(randomstring) --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 }
 
 setLocalEnv(){
@@ -110,14 +109,14 @@ stopVaultDocker(){
 }
 initializeVault(){
   source .env
-	vault operator init -key-shares=1 -key-threshold=1 > initoutput
+  vault operator init -key-shares=1 -key-threshold=1 > initoutput
   export roottoken=$(cat initoutput | grep Root | awk '{print $4}')
   export unsealtoken=$(cat initoutput | grep Unseal | awk '{print $4}')
-	echo export ROOT_TOKEN=$roottoken >> .env
+  echo export ROOT_TOKEN=$roottoken >> .env
   echo export UNSEAL_TOKEN=$unsealtoken >> .env
   sleep 2
-	vault operator unseal $unsealtoken
-	rm -rf initoutput
+  vault operator unseal $unsealtoken
+  rm -rf initoutput
   vault secrets enable kv-v2
 }
 setSecret(){
