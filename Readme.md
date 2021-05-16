@@ -1,4 +1,14 @@
 
+# The Local Vault Installed on your junk project!
+#### TL;DR:
+If you clone this down to a directory at ~/secrets/, you can do the following in your .zshrc or .bashrc files:
+```
+export AWS_ACCESS_KEY_ID=$(pushd ~/secrets > /dev/null; ./vault.sh getSecret aws_access_key_id; popd > /dev/null)
+```
+Then, open a new terminal, and:
+```
+echo $AWS_ACCESS_KEY_ID
+```
 ## Prereqs
 * Docker installed
 * Vault cli installed `brew install vault`
@@ -43,12 +53,10 @@ Note: this will destroy anything you have already inited.
 ## Set/Get Secret Usage
 * Set secrets:
 ```
-./vault.sh setSecret thing key value
+./vault.sh setSecret key value
 ```
-Note: "thing" points to a "group" of things; key is what the secret is known as, value is the secret.
 
 * Get secrets:
 ```
-./vault.sh getSecret thing key
+./vault.sh getSecret key
 ```
-Note: "thing" points to a "group" of things;key is what the secret is known as.

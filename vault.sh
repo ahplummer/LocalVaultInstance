@@ -129,7 +129,7 @@ setSecret(){
     exit 1
   fi
   vault login $ROOT_TOKEN >/dev/null
-  vault kv put kv-v2/$1 $2=$3
+  vault kv put kv-v2/$1 $1=$2
 }
 getSecret(){
   if [ -f ".env" ]
@@ -140,7 +140,7 @@ getSecret(){
     exit 1
   fi
   vault login $ROOT_TOKEN >/dev/null
-  export secret=$(VAULT_FORMAT=json vault kv get kv-v2/$1 | jq -r '.data.data.'$2)
+  export secret=$(VAULT_FORMAT=json vault kv get kv-v2/$1 | jq -r '.data.data.'$1)
   echo $secret
 }
 
@@ -184,18 +184,18 @@ stopVault) log "Stop Vault Command received"
     ;;
 # Set Secret
 setSecret) 
-if [[ -z $2 || -z $3 || -z $4 ]]
+if [[ -z $2 || -z $3 ]]
     then
-      error "You need three additional parms for this command (location, key, secret)"
+      error "You need two additional parms for this command (key, secret)"
     else
-      setSecret $2 $3 $4
+      setSecret $2 $3
     fi
     ;;
 # Get Secret
 getSecret) 
-    if [[ -z $2 || -z $3 ]]
+    if [ -z $2 ]
     then
-      error "You need two additional parms for this command (location, key)"
+      error "You need one additional parm for this command (a key)."
     else
       getSecret $2 $3 
     fi
