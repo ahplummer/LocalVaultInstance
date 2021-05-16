@@ -81,7 +81,14 @@ setLocalEnv(){
 	echo export VAULT_CONFIG=/vault/config/vaultfile.json >> .env
 }
 startVaultDocker(){
-  source .env
+  if [ -f ".env" ]
+  then
+    log "Found vault environment..."
+    source .env
+  else
+    error "For this command, you'll need a pre-configured Vault instance; try './vault.sh initS3' or './vault.sh' initLocal"
+    exit 1
+  fi
   docker-compose up -d
   log "Sleeping a bit for container to stand up"
   sleep 5
