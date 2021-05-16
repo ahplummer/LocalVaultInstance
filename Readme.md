@@ -1,5 +1,6 @@
 
 # The Local Vault Installed on your junk project!
+This installs Hashicorp Vault via docker. You set secrets, and leverage this throughout your terminal use-cases....
 #### TL;DR:
 If you clone this down to a directory at ~/secrets/, you can do the following in your .zshrc or .bashrc files:
 ```
